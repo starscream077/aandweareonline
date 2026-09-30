@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101a18">
+    <meta name="description" content="A pocket-sized arcade packed with 18 pixel-era classics. Pick a cabinet and play.">
+    <title>Quarter Club - The little big arcade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="arcade.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Quarter Club home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>quarter<span class="brand-dot">.</span>club</span>
+      </a>
+      <div class="topbar-note"><span class="live-dot"></span> OPEN ALL NIGHT <span class="topbar-divider">/</span> EST. 198X</div>
+      <a class="topbar-link" href="#arcade">THE ARCADE <span aria-hidden="true">↘</span></a>
+    </header>
+
+    <main id="top">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+          <p class="eyebrow"><span class="eyebrow-square"></span> INSERT COIN, FIND JOY</p>
+          <h1 id="page-title">Good games.<br><span>No quarters.</span></h1>
+          <p class="intro-description">A little collection of big-feeling arcade classics. Pick your cabinet, chase a high score, forget what year it is.</p>
+          <a class="jump-link" href="#arcade">PICK A GAME <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="intro-art" aria-hidden="true">
+          <div class="sun-disc"></div>
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          <div class="art-star star-one">✳</div><div class="art-star star-two">✦</div>
+          <div class="pixel-ship"><span></span></div>
+          <div class="art-caption">PLAYER 01<br>READY WHEN YOU ARE</div>
+          <div class="art-stamp">FREE<br>PLAY</div>
+        </div>
+        <div class="intro-side-note">18 ORIGINAL ARCADE FAVORITES <span>✳</span> ONE VERY LARGE JOYSTICK</div>
+      </section>
+
+      <section class="arcade-section" id="arcade" aria-labelledby="arcade-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-square"></span> TAKE YOUR PICK</p>
+            <h2 id="arcade-heading">The arcade<span class="heading-period">.</span></h2>
+          </div>
+          <div class="game-count"><span id="visible-count">18</span> CABINETS <span class="count-star">✳</span></div>
+        </div>
+        <div class="catalog-tools">
+          <div class="filter-list" role="group" aria-label="Filter games by genre">
+            <button class="filter-chip is-active" type="button" data-filter="All">ALL <span>18</span></button>
+            <button class="filter-chip" type="button" data-filter="Action">ACTION</button>
+            <button class="filter-chip" type="button" data-filter="Puzzle">PUZZLE</button>
+            <button class="filter-chip" type="button" data-filter="Classics">CLASSICS</button>
+          </div>
+          <label class="search-box"><span aria-hidden="true">⌕</span><input id="game-search" type="search" placeholder="Find a game" autocomplete="off" aria-label="Search games"><kbd>/</kbd></label>
+        </div>
+        <div class="game-grid" id="game-grid" aria-live="polite"></div>
+        <div class="empty-state" id="empty-state" hidden>No cabinets match that search. Try another name.</div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>quarter<span class="brand-dot">.</span>club</span></a>
+      <p>MADE FOR THE LOVE OF ONE MORE ROUND.</p>
+      <a href="#top" class="back-top">BACK TO TOP ↑</a>
+    </footer>
+
+    <dialog class="cabinet" id="cabinet" aria-labelledby="cabinet-title">
+      <div class="cabinet-topline"><span class="cabinet-label"><span class="live-dot"></span> NOW PLAYING</span><button class="icon-button close-button" id="close-game" type="button" aria-label="Close game" title="Close game">×</button></div>
+      <div class="cabinet-heading"><div><p class="game-meta" id="cabinet-meta"></p><h2 id="cabinet-title">Game title</h2></div><div class="scoreboard"><span>HI <b id="high-score">00000</b></span><span>SCORE <b id="current-score">00000</b></span></div></div>
+      <div class="screen-frame">
+        <canvas id="game-canvas" width="480" height="270" aria-label="Game screen"></canvas>
+        <div class="screen-scanlines" aria-hidden="true"></div>
+      </div>
+      <div class="cabinet-bottomline"><p id="game-instructions">Use the arrows to play.</p><div class="game-actions"><button class="text-button" id="pause-game" type="button">Ⅱ <span>PAUSE</span></button><button class="text-button" id="restart-game" type="button">↻ <span>RESTART</span></button></div></div>
+      <div class="touch-controls" aria-label="Touch game controls">
+        <div class="touch-dpad"><button type="button" data-key="ArrowUp" aria-label="Up">↑</button><button type="button" data-key="ArrowLeft" aria-label="Left">←</button><button type="button" data-key="ArrowDown" aria-label="Down">↓</button><button type="button" data-key="ArrowRight" aria-label="Right">→</button></div>
+        <button class="touch-fire" type="button" data-key=" " aria-label="Fire or jump">A</button>
+      </div>
+      <p class="cabinet-footnote">ARROWS / WASD TO MOVE <span>•</span> SPACE TO ACTION <span>•</span> ESC TO EXIT</p>
+    </dialog>
+  </body>
+</html>
