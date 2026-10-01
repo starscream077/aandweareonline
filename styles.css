@@ -194,7 +194,7 @@ a { color: inherit; text-decoration: none; }
   .game-art { min-height: 119px; }
   .game-info { padding-inline: 10px; }
   .game-name { font-size: 15px; }
-  .cabinet { inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: max(12px,env(safe-area-inset-top)) 15px max(12px,env(safe-area-inset-bottom)); border: 0; border-radius: 0; display: grid; grid-template-rows: auto auto minmax(0,40dvh) minmax(0,32dvh) auto auto; gap: 0; overflow: hidden; }
+  .cabinet[open] { inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: max(12px,env(safe-area-inset-top)) 15px max(12px,env(safe-area-inset-bottom)); border: 0; border-radius: 0; display: grid; grid-template-rows: auto auto minmax(0,40dvh) minmax(0,32dvh) auto auto; gap: 0; overflow: hidden; }
   .cabinet-topline { min-height: 34px; }
   .cabinet-heading { min-height: 55px; }
   .screen-frame { min-height: 0; border-width: 5px; display: grid; place-items: center; }
