@@ -143,12 +143,6 @@ a { color: inherit; text-decoration: none; }
 .screen-frame { position: relative; border: 8px solid #182421; background: #101a18; box-shadow: 0 0 0 1px #738075; overflow: hidden; }
 #game-canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; }
 .screen-scanlines { pointer-events: none; position: absolute; inset: 0; opacity: .1; background: repeating-linear-gradient(to bottom,transparent 0 3px,#000 4px); }
-.screen-ready { position: absolute; z-index: 2; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; background: #101a18; color: var(--acid); }
-.screen-ready[hidden] { display: none; }
-.screen-ready p { margin: 0; color: #9ba99a; font: 10px var(--mono); letter-spacing: .08em; }
-.ready-button { display: inline-flex; align-items: center; gap: 12px; padding: 14px 18px; border: 0; background: var(--acid); color: var(--ink); cursor: pointer; font: 500 11px var(--mono); }
-.ready-button span { font-size: 16px; }
-.ready-button:hover { background: #e4ff91; }
 .cabinet-bottomline { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid var(--line); }
 .cabinet-bottomline p { color: #677167; font: 10px var(--mono); margin: 0; }
 .game-actions { display: flex; gap: 14px; }

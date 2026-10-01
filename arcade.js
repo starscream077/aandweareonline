@@ -62,10 +62,6 @@ grid.addEventListener("click", (event) => {
   if (button) launch(games.find((game) => game.id === button.dataset.play));
 });
 document.querySelector("#close-game").addEventListener("click", closeGame);
-document.querySelector("#start-game").addEventListener("click", () => {
-  document.querySelector("#screen-ready").hidden = true;
-  startGame();
-});
 dialog.addEventListener("click", (event) => { if (event.target === dialog) closeGame(); });
 document.querySelector("#restart-game").addEventListener("click", () => startGame());
 document.querySelector("#pause-game").addEventListener("click", () => {
@@ -86,15 +82,8 @@ function launch(game) {
   document.querySelector("#cabinet-title").textContent = game.name;
   document.querySelector("#cabinet-meta").textContent = `${game.genre.toUpperCase()} / EST. ${game.year}`;
   document.querySelector("#game-instructions").textContent = game.instruction;
-  document.querySelector("#screen-ready").hidden = false;
-  document.querySelector("#pause-game span").textContent = "PAUSE";
-  scoreNode.textContent = "00000";
-  highNode.textContent = String(Number(localStorage.getItem(`quarterclub:${game.id}`) || 0)).padStart(5, "0");
-  keys.clear();
-  paused = false;
-  state = null;
-  cancelAnimationFrame(raf);
   dialog.showModal();
+  startGame();
 }
 
 function closeGame() {
