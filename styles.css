@@ -194,9 +194,17 @@ a { color: inherit; text-decoration: none; }
   .game-art { min-height: 119px; }
   .game-info { padding-inline: 10px; }
   .game-name { font-size: 15px; }
-  .cabinet { padding: 17px 15px 14px; }
-  .screen-frame { border-width: 5px; }
+  .cabinet { inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: max(12px,env(safe-area-inset-top)) 15px max(12px,env(safe-area-inset-bottom)); border: 0; border-radius: 0; display: grid; grid-template-rows: auto auto minmax(0,40dvh) minmax(0,32dvh) auto auto; gap: 0; overflow: hidden; }
+  .cabinet-topline { min-height: 34px; }
+  .cabinet-heading { min-height: 55px; }
+  .screen-frame { min-height: 0; border-width: 5px; display: grid; place-items: center; }
+  #game-canvas { width: 100%; height: 100%; max-height: 100%; aspect-ratio: auto; }
   .touch-controls { display: flex; }
+  .touch-controls { grid-row: 4; min-height: 0; height: 100%; padding: 8px 5vw; }
+  .touch-dpad { width: min(44vw,220px); height: min(25dvh,180px); gap: 6px; }
+  .touch-dpad button { font-size: 30px; }
+  .touch-fire { width: min(31vw,150px); height: min(31vw,150px); max-height: 24dvh; font-size: 16px; }
+  .cabinet-bottomline { grid-row: 5; min-height: 42px; }
   .cabinet-footnote { margin-top: 11px; }
 }
 @media (max-width: 500px) {
