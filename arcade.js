@@ -113,6 +113,7 @@ function createState(id) {
   if (["invaders", "galaga"].includes(id)) Object.assign(s, { x: 240, enemies: Array.from({ length: 21 }, (_, i) => ({ x: 72 + i % 7 * 54, y: 38 + Math.floor(i / 7) * 28, on: true })), shots: [], enemyShots: [], enemyDir: 1, fireCooldown: 0 });
   if (id === "asteroids") Object.assign(s, { x: 240, y: 135, angle: -Math.PI / 2, vx: 0, vy: 0, rocks: Array.from({ length: 7 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 11 + Math.random() * 13, vx: (Math.random() - .5) * 1.6, vy: (Math.random() - .5) * 1.6 })), shots: [] });
   if (["frogger", "maze", "bomber", "qbert"].includes(id)) Object.assign(s, { x: id === "qbert" ? 240 : 32, y: id === "qbert" ? 38 : 238, moveAt: 0, dots: Array.from({ length: 10 }, (_, i) => ({ x: 46 + i % 5 * 88, y: 43 + Math.floor(i / 5) * 72, on: true })), bombs: [], enemies: [{ x: 405, y: 100, dir: 1 }] });
+  if (id === "bomber") Object.assign(s, { enemies: [{ x: 405, y: 100 }, { x: 420, y: 220 }, { x: 60, y: 40 }], walls: Array.from({ length: 9 }, (_, i) => ({ x: 70 + i * 43, y: 80 + i % 2 * 70 })), blasts: [] });
   if (id === "qbert") Object.assign(s, { row: 0, col: 0, tiles: Array.from({ length: 6 }, (_, row) => Array(row + 1).fill(false)) });
   if (id === "kong") Object.assign(s, { x: 35, y: 225, vy: 0, onGround: true, star: true, barrels: [] });
   if (id === "lander") Object.assign(s, { x: 80, y: 75, vx: 1, vy: 0, angle: 0, fuel: 100 });
@@ -217,14 +218,46 @@ function update(dt) {
           s.moveAt = s.tick + 7;
         }
       } else {
-        s.x = clamp(s.x + dx * (id === "frogger" ? 30 : 10), 18, 462); s.y = clamp(s.y + dy * (id === "frogger" ? 29 : 10), 20, 250);
+        const nextX = clamp(s.x + dx * (id === "frogger" ? 30 : 10), 18, 462);
+        const nextY = clamp(s.y + dy * (id === "frogger" ? 29 : 10), 20, 250);
+        if (id === "bomber") {
+          const blocked = (x, y) => s.walls.some((wall) => x + 7 > wall.x && x - 7 < wall.x + 20 && y + 7 > wall.y && y - 7 < wall.y + 20);
+          if (!blocked(nextX, s.y)) s.x = nextX;
+          if (!blocked(s.x, nextY)) s.y = nextY;
+        } else { s.x = nextX; s.y = nextY; }
         if (dx || dy) { s.moveAt = s.tick + (id === "frogger" ? 7 : 1.5); updateScore(s.score + 1); }
       }
     }
     if (id === "frogger") { if (s.y < 35) { updateScore(s.score + 50); s.x = 32 + Math.random() * 400; s.y = 238; } if (s.y > 80 && s.y < 205 && Math.floor(s.x / 60) % 2 === Math.floor(s.y / 50) % 2) endGame(); }
-    if (id === "maze") { const dot = s.dots.find((d) => d.on && Math.hypot(d.x - s.x, d.y - s.y) < 18); if (dot) { dot.on = false; updateScore(s.score + 10); } const ghost = s.enemies[0]; ghost.x += Math.sign(s.x - ghost.x) * .4; ghost.y += Math.sign(s.y - ghost.y) * .35; if (Math.hypot(ghost.x - s.x, ghost.y - s.y) < 14) endGame(); if (s.dots.every((d) => !d.on)) endGame(); }
-    if (id === "bomber" && down(" ") && !s.bombs.some((b) => b.x === s.x && b.y === s.y)) s.bombs.push({ x: s.x, y: s.y, fuse: 75 });
-    s.bombs.forEach((b) => b.fuse -= dt); s.bombs.filter((b) => b.fuse <= 0).forEach((b) => { s.enemies.forEach((e) => { if (Math.abs(e.x - b.x) < 50 && Math.abs(e.y - b.y) < 50) { e.x = Math.random() * W; e.y = Math.random() * 190; updateScore(s.score + 25); } }); }); s.bombs = s.bombs.filter((b) => b.fuse > 0);
+    if (id === "maze") { const dot = s.dots.find((d) => d.on && Math.hypot(d.x - s.x, d.y - s.y) < 18); if (dot) { dot.on = false; updateScore(s.score + 10); } const ghost = s.enemies[0]; ghost.x += Math.sign(s.x - ghost.x) * .4; ghost.y += Math.sign(s.y - ghost.y) * .35; if (Math.hypot(ghost.x - s.x, ghost.y - s.y) < 14) endGame(); if (s.dots.every((d) => !d.on)) endGame(true); }
+    if (id === "bomber") {
+      const blocked = (x, y) => s.walls.some((wall) => x + 8 > wall.x && x - 8 < wall.x + 20 && y + 8 > wall.y && y - 8 < wall.y + 20);
+      for (const enemy of s.enemies) {
+        const dx = s.x - enemy.x, dy = s.y - enemy.y, distance = Math.hypot(dx, dy) || 1;
+        const nextX = clamp(enemy.x + dx / distance * 1.05 * dt, 8, W - 8);
+        const nextY = clamp(enemy.y + dy / distance * 1.05 * dt, 8, H - 8);
+        if (!blocked(nextX, nextY)) { enemy.x = nextX; enemy.y = nextY; }
+        else if (!blocked(nextX, enemy.y)) enemy.x = nextX;
+        else if (!blocked(enemy.x, nextY)) enemy.y = nextY;
+        if (Math.hypot(enemy.x - s.x, enemy.y - s.y) < 16) return endGame();
+      }
+      if (down(" ") && !s.bombs.some((bomb) => bomb.x === s.x && bomb.y === s.y)) s.bombs.push({ x: s.x, y: s.y, fuse: 75 });
+      s.bombs.forEach((bomb) => bomb.fuse -= dt);
+      let playerHit = false;
+      s.bombs.filter((bomb) => bomb.fuse <= 0).forEach((bomb) => {
+        s.blasts.push({ x: bomb.x, y: bomb.y, life: 8 });
+        if (Math.hypot(s.x - bomb.x, s.y - bomb.y) < 50) playerHit = true;
+        const remaining = s.enemies.length;
+        s.enemies = s.enemies.filter((enemy) => Math.hypot(enemy.x - bomb.x, enemy.y - bomb.y) >= 50);
+        const hits = remaining - s.enemies.length;
+        if (hits) updateScore(s.score + hits * 25);
+      });
+      s.bombs = s.bombs.filter((bomb) => bomb.fuse > 0);
+      s.blasts.forEach((blast) => blast.life -= dt);
+      s.blasts = s.blasts.filter((blast) => blast.life > 0);
+      if (playerHit) return endGame();
+      if (!s.enemies.length) endGame(true);
+    }
   } else if (id === "kong") {
     s.x = clamp(s.x + (down("arrowleft", "a") ? -2.6 : 0) + (down("arrowright", "d") ? 2.6 : 0), 12, 468);
     if (down(" ") && s.onGround) { s.vy = -5.5; s.onGround = false; }
@@ -238,7 +271,7 @@ function update(dt) {
     s.vy += .035 * dt;
     if (down("w", "arrowup") && s.fuel > 0) { s.vx += Math.sin(s.angle) * .09 * dt; s.vy -= Math.cos(s.angle) * .09 * dt; s.fuel -= .15 * dt; }
     s.x += s.vx * dt; s.y += s.vy * dt; s.vx *= .998;
-    if (s.x < 0 || s.x > W || s.y > 254) { if (s.y > 242 && Math.abs(s.vy) < 1.1 && s.x > 190 && s.x < 285) { updateScore(s.score + 100); endGame(); } else if (s.y > 260) endGame(); else s.x = clamp(s.x, 0, W); }
+    if (s.x < 0 || s.x > W || s.y > 254) { if (s.y > 242 && Math.abs(s.vy) < 1.1 && s.x > 190 && s.x < 285) { updateScore(s.score + 100); endGame(true); } else if (s.y > 260) endGame(); else s.x = clamp(s.x, 0, W); }
   } else if (id === "ski") {
     s.x = clamp(s.x + (down("arrowleft", "a") ? -3 : 0) + (down("arrowright", "d") ? 3 : 0), 14, 466); s.spawn += dt;
     if (s.spawn > 22) { s.spawn = 0; s.obstacles.push({ x: 15 + Math.random() * 450, y: -5, type: Math.random() > .7 ? "rock" : "tree" }); }
@@ -284,7 +317,12 @@ function draw() {
   else if (["frogger", "maze", "bomber", "qbert"].includes(id)) {
     if (id === "frogger") { for (let y = 50; y < 235; y += 36) { ctx.fillStyle = y < 85 ? "#264238" : y < 200 ? "#174d59" : "#21362f"; ctx.fillRect(0, y, W, 32); } for (let i = 0; i < 6; i++) box((i * 81 + s.tick * (i % 2 ? 1 : -1)) % W, 105 + i % 3 * 30, 38, 14, "#b18b54"); }
     if (id === "maze") { for (let x = 20; x < W; x += 58) { ctx.strokeStyle = "#73d9d0"; ctx.strokeRect(x, 20, 38, 230); } s.dots.filter((d) => d.on).forEach((d) => box(d.x, d.y, 4, 4, "#ffca63")); ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(s.enemies[0].x, s.enemies[0].y, 8, 0, 7); ctx.fill(); }
-    if (id === "bomber") { for (let i = 0; i < 9; i++) box(70 + i * 43, 80 + i % 2 * 70, 20, 20, "#51675b"); s.bombs.forEach((b) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(b.x, b.y, 8 + Math.sin(s.tick) * 2, 0, 7); ctx.fill(); }); }
+    if (id === "bomber") {
+      s.walls.forEach((wall) => box(wall.x, wall.y, 20, 20, "#51675b"));
+      s.enemies.forEach((enemy) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 8, 0, Math.PI * 2); ctx.fill(); });
+      s.bombs.forEach((bomb) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(bomb.x, bomb.y, 8 + Math.sin(s.tick) * 2, 0, Math.PI * 2); ctx.fill(); });
+      s.blasts.forEach((blast) => { ctx.fillStyle = `rgba(255, 117, 88, ${blast.life / 8 * .28})`; ctx.beginPath(); ctx.arc(blast.x, blast.y, 50, 0, Math.PI * 2); ctx.fill(); });
+    }
     if (id === "qbert") { for (let row = 0; row < 6; row++) for (let col = 0; col <= row; col++) { const x = 240 + (col - row / 2) * 42, y = 39 + row * 33; ctx.fillStyle = s.tiles[row][col] ? "#73d9d0" : (row * 3 + col) % 2 ? "#c85e49" : "#e3a64f"; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 20, y + 11); ctx.lineTo(x, y + 22); ctx.lineTo(x - 20, y + 11); ctx.closePath(); ctx.fill(); } }
     box(s.x - 7, s.y - 7, 14, 14, "#d6ff57");
   } else if (id === "kong") { [228, 178, 128, 78].forEach((y) => box(0, y, W, 5, "#ff7558")); for (let x = 100; x < 400; x += 105) box(x, 80, 6, 148, "#73d9d0"); s.barrels.forEach((b) => box(b.x, b.y, 12, 12, "#ffca63")); box(s.x - 6, s.y - 14, 12, 14, "#d6ff57"); if (s.y < 52) box(425, 40, 18, 18, "#ffca63"); }
