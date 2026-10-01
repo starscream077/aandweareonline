@@ -3,9 +3,12 @@ const games = [
   { id: "pong", name: "Pong", genre: "Classics", year: "1972", glyph: "Ⅱ", color: "#ff7558", instruction: "Move your paddle with ↑ ↓ or W S." },
   { id: "breakout", name: "Breakout", genre: "Action", year: "1976", glyph: "▤", color: "#73d9d0", instruction: "Move with ← →. Clear every brick." },
   { id: "invaders", name: "Space Invaders", genre: "Action", year: "1978", glyph: "✳", color: "#ff7558", instruction: "← → to move, SPACE to fire. Don't let them land." },
+  { id: "centipede", name: "Centipede", genre: "Action", year: "1981", glyph: "C", color: "#73d9d0", instruction: "← → to move, SPACE to fire. Keep the chain out of your garden." },
+  { id: "missile", name: "Missile Command", genre: "Action", year: "1980", glyph: "✳", color: "#ffca63", instruction: "Arrows aim, SPACE launches a blast. Protect all three bases." },
   { id: "asteroids", name: "Asteroids", genre: "Action", year: "1979", glyph: "✦", color: "#d6ff57", instruction: "A / D to turn, W to thrust, SPACE to blast." },
   { id: "frogger", name: "Frogger", genre: "Classics", year: "1981", glyph: "⌁", color: "#73d9d0", instruction: "Hop with the arrows. Reach the top without getting squished." },
   { id: "maze", name: "Maze Chase", genre: "Classics", year: "1980", glyph: "◉", color: "#ffca63", instruction: "Collect every dot. Avoid the roaming chaser." },
+  { id: "digdug", name: "Dig Dug", genre: "Classics", year: "1982", glyph: "D", color: "#ff7558", instruction: "Arrows move, SPACE pumps. Clear every tunneling foe." },
   { id: "bomber", name: "Bomb Squad", genre: "Action", year: "1983", glyph: "✹", color: "#ff7558", instruction: "Move with arrows, SPACE to drop a bomb. Keep moving!" },
   { id: "kong", name: "Barrel Hop", genre: "Classics", year: "1981", glyph: "↗", color: "#ffca63", instruction: "← → to run, SPACE to jump. Grab the star up top." },
   { id: "galaga", name: "Galaga", genre: "Action", year: "1981", glyph: "⌖", color: "#73d9d0", instruction: "← → to dodge, SPACE to fire at the formation." },
@@ -16,6 +19,7 @@ const games = [
   { id: "river", name: "River Raid", genre: "Action", year: "1982", glyph: "⌁", color: "#73d9d0", instruction: "← → to steer, SPACE to fire. Stay between the banks." },
   { id: "racer", name: "Turbo Racer", genre: "Action", year: "1983", glyph: "▰", color: "#ff7558", instruction: "← → to change lanes. Dodge traffic and go the distance." },
   { id: "tetris", name: "Tetris", genre: "Puzzle", year: "1984", glyph: "▦", color: "#73d9d0", instruction: "← → move, ↑ rotate, ↓ soft drop, SPACE hard drop." },
+  { id: "simon", name: "Simon", genre: "Puzzle", year: "1978", glyph: "◉", color: "#ffca63", instruction: "Watch the sequence, then repeat it with the arrow keys." },
   { id: "jump", name: "Space Jump", genre: "Action", year: "1982", glyph: "↑", color: "#d6ff57", instruction: "← → to steer. Bounce from platform to platform." },
 ];
 
@@ -112,6 +116,10 @@ function createState(id) {
   if (["pong", "breakout", "paddle"].includes(id)) Object.assign(s, { x: 240, y: id === "pong" ? 135 : 218, enemyY: 135, ball: { x: 240, y: 170, vx: id === "pong" ? -2.3 : 2.3, vy: 2.4 }, bricks: Array.from({ length: id === "paddle" ? 10 : 28 }, (_, i) => ({ x: 38 + i % 7 * 58, y: 42 + Math.floor(i / 7) * 19, on: true })) });
   if (["invaders", "galaga"].includes(id)) Object.assign(s, { x: 240, enemies: Array.from({ length: 21 }, (_, i) => ({ x: 72 + i % 7 * 54, y: 38 + Math.floor(i / 7) * 28, on: true })), shots: [], enemyShots: [], enemyDir: 1, fireCooldown: 0 });
   if (id === "asteroids") Object.assign(s, { x: 240, y: 135, angle: -Math.PI / 2, vx: 0, vy: 0, rocks: Array.from({ length: 7 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 11 + Math.random() * 13, vx: (Math.random() - .5) * 1.6, vy: (Math.random() - .5) * 1.6 })), shots: [] });
+  if (id === "centipede") Object.assign(s, { playerX: 240, playerY: 244, direction: 1, moveTimer: 0, segments: Array.from({ length: 10 }, (_, i) => ({ x: 18 + i * 18, y: 34 })), mushrooms: Array.from({ length: 14 }, (_, i) => ({ x: 28 + (i * 73) % 425, y: 60 + (i * 47) % 145 })), shots: [], fireCooldown: 0 });
+  if (id === "digdug") Object.assign(s, { x: 30, y: 238, dir: { x: 1, y: 0 }, moveAt: 0, pumpCooldown: 0, walls: Array.from({ length: 8 }, (_, i) => ({ x: 88 + i * 42, y: 78 + i % 2 * 70 })), enemies: [{ x: 430, y: 40 }, { x: 430, y: 225 }, { x: 45, y: 38 }] });
+  if (id === "simon") Object.assign(s, { sequence: [Math.floor(Math.random() * 4)], phase: "show", showIndex: 0, inputIndex: 0, flash: -1, stepAt: 24, flashUntil: 0, inputLocked: false });
+  if (id === "missile") Object.assign(s, { x: 240, y: 110, bases: [62, 240, 418].map((x) => ({ x, alive: true })), missiles: [], blasts: [], spawn: 0, spawned: 0, quota: 24, fireCooldown: 0 });
   if (["frogger", "maze", "bomber", "qbert"].includes(id)) Object.assign(s, { x: id === "qbert" ? 240 : 32, y: id === "qbert" ? 38 : 238, moveAt: 0, dots: Array.from({ length: 10 }, (_, i) => ({ x: 46 + i % 5 * 88, y: 43 + Math.floor(i / 5) * 72, on: true })), bombs: [], enemies: [{ x: 405, y: 100, dir: 1 }] });
   if (id === "bomber") Object.assign(s, { enemies: [{ x: 405, y: 100 }, { x: 420, y: 220 }, { x: 60, y: 40 }], walls: Array.from({ length: 9 }, (_, i) => ({ x: 70 + i * 43, y: 80 + i % 2 * 70 })), blasts: [] });
   if (id === "qbert") Object.assign(s, { row: 0, col: 0, tiles: Array.from({ length: 6 }, (_, row) => Array(row + 1).fill(false)) });
@@ -170,6 +178,59 @@ function update(dt) {
     if (s.ball.vx > 0 && s.ball.x > 449 && Math.abs(s.ball.y - s.enemyY) < 28) s.ball.vx = -Math.abs(s.ball.vx);
     if (s.ball.x < -5) endGame();
     if (s.ball.x > 485) { updateScore(s.score + 10); s.ball = { x: 240, y: 130, vx: -2.5, vy: Math.random() > .5 ? 1.8 : -1.8 }; }
+  } else if (id === "centipede") {
+    s.playerX = clamp(s.playerX + (down("arrowleft", "a") ? -4 : 0) + (down("arrowright", "d") ? 4 : 0), 12, W - 12);
+    s.fireCooldown -= dt;
+    if (down(" ") && s.fireCooldown <= 0) { s.shots.push({ x: s.playerX, y: s.playerY - 12 }); s.fireCooldown = 12; }
+    s.moveTimer += dt;
+    if (s.moveTimer >= 5) {
+      s.moveTimer = 0;
+      const head = s.segments[s.direction > 0 ? s.segments.length - 1 : 0];
+      const nextX = head.x + s.direction * 9;
+      if (nextX < 8 || nextX > W - 8 || s.mushrooms.some((mushroom) => Math.hypot(mushroom.x - nextX, mushroom.y - head.y) < 13)) {
+        s.direction *= -1;
+        s.segments.forEach((segment) => segment.y += 12);
+      } else s.segments.forEach((segment) => segment.x += s.direction * 9);
+    }
+    s.shots.forEach((shot) => shot.y -= 6 * dt);
+    s.shots.forEach((shot) => {
+      const index = s.segments.findIndex((segment) => Math.hypot(segment.x - shot.x, segment.y - shot.y) < 12);
+      if (index >= 0) {
+        const [hit] = s.segments.splice(index, 1);
+        shot.y = -10;
+        if (!s.mushrooms.some((mushroom) => Math.hypot(mushroom.x - hit.x, mushroom.y - hit.y) < 14)) s.mushrooms.push({ x: hit.x, y: hit.y });
+        updateScore(s.score + 25);
+      }
+    });
+    s.shots = s.shots.filter((shot) => shot.y > -5);
+    if (s.segments.some((segment) => segment.y > 228 || Math.hypot(segment.x - s.playerX, segment.y - s.playerY) < 16)) endGame();
+    else if (!s.segments.length) endGame(true);
+  } else if (id === "missile") {
+    s.x = clamp(s.x + (down("arrowleft", "a") ? -3.5 : 0) + (down("arrowright", "d") ? 3.5 : 0), 12, W - 12);
+    s.y = clamp(s.y + (down("arrowup", "w") ? -3.5 : 0) + (down("arrowdown", "s") ? 3.5 : 0), 18, 225);
+    s.fireCooldown -= dt;
+    if (down(" ") && s.fireCooldown <= 0) { s.blasts.push({ x: s.x, y: s.y, radius: 0, life: 28 }); s.fireCooldown = 12; }
+    s.spawn += dt;
+    const livingBases = s.bases.filter((base) => base.alive);
+    if (s.spawn >= 28 && s.spawned < s.quota && livingBases.length) {
+      s.spawn = 0;
+      const target = livingBases[Math.floor(Math.random() * livingBases.length)];
+      const launchX = 14 + Math.random() * (W - 28), launchY = -6;
+      const distance = Math.hypot(target.x - launchX, target.y - launchY);
+      const speed = .72;
+      s.missiles.push({ x: launchX, y: launchY, vx: (target.x - launchX) / distance * speed, vy: (target.y - launchY) / distance * speed, target });
+      s.spawned++;
+    }
+    s.blasts.forEach((blast) => { blast.radius = Math.min(46, blast.radius + 2.8 * dt); blast.life -= dt; });
+    s.blasts = s.blasts.filter((blast) => blast.life > 0);
+    s.missiles.forEach((missile) => { missile.x += missile.vx * dt; missile.y += missile.vy * dt; });
+    s.missiles = s.missiles.filter((missile) => {
+      if (s.blasts.some((blast) => Math.hypot(blast.x - missile.x, blast.y - missile.y) < blast.radius)) { updateScore(s.score + 25); return false; }
+      if (missile.y >= 246) { missile.target.alive = false; return false; }
+      return true;
+    });
+    if (!s.bases.some((base) => base.alive)) endGame();
+    else if (s.spawned >= s.quota && !s.missiles.length) endGame(true);
   } else if (id === "breakout" || id === "paddle") {
     s.x = clamp(s.x + (down("arrowleft", "a") ? -5 : 0) + (down("arrowright", "d") ? 5 : 0), 30, 450);
     s.ball.x += s.ball.vx * dt; s.ball.y += s.ball.vy * dt;
@@ -258,6 +319,62 @@ function update(dt) {
       if (playerHit) return endGame();
       if (!s.enemies.length) endGame(true);
     }
+  } else if (id === "digdug") {
+    const blocked = (x, y) => s.walls.some((wall) => x + 7 > wall.x && x - 7 < wall.x + 20 && y + 7 > wall.y && y - 7 < wall.y + 20);
+    if (s.tick > s.moveAt) {
+      let dx = 0, dy = 0;
+      if (down("arrowleft", "a")) dx = -1;
+      else if (down("arrowright", "d")) dx = 1;
+      else if (down("arrowup", "w")) dy = -1;
+      else if (down("arrowdown", "s")) dy = 1;
+      if (dx || dy) {
+        s.dir = { x: dx, y: dy };
+        if (!blocked(s.x + dx * 10, s.y)) s.x += dx * 10;
+        if (!blocked(s.x, s.y + dy * 10)) s.y += dy * 10;
+        s.moveAt = s.tick + 1.5;
+      }
+    }
+    s.pumpCooldown -= dt;
+    s.enemies.forEach((enemy) => {
+      const dx = s.x - enemy.x, dy = s.y - enemy.y, distance = Math.hypot(dx, dy) || 1;
+      const nextX = clamp(enemy.x + dx / distance * .48 * dt, 8, W - 8);
+      const nextY = clamp(enemy.y + dy / distance * .48 * dt, 8, H - 8);
+      if (!blocked(nextX, nextY)) { enemy.x = nextX; enemy.y = nextY; }
+      else if (!blocked(nextX, enemy.y)) enemy.x = nextX;
+      else if (!blocked(enemy.x, nextY)) enemy.y = nextY;
+    });
+    if (s.enemies.some((enemy) => Math.hypot(enemy.x - s.x, enemy.y - s.y) < 14)) endGame();
+    else if (down(" ") && s.pumpCooldown <= 0) {
+      const target = s.enemies.find((enemy) => {
+        const dx = enemy.x - s.x, dy = enemy.y - s.y;
+        return Math.abs(dx * s.dir.y - dy * s.dir.x) < 12 && dx * s.dir.x + dy * s.dir.y > 0 && Math.hypot(dx, dy) < 58;
+      });
+      s.pumpCooldown = 12;
+      if (target) { s.enemies.splice(s.enemies.indexOf(target), 1); updateScore(s.score + 100); }
+      if (!s.enemies.length) endGame(true);
+    }
+  } else if (id === "simon") {
+    if (s.phase === "show" && s.tick >= s.stepAt) {
+      if (s.flash >= 0) { s.flash = -1; s.stepAt = s.tick + 6; }
+      else if (s.showIndex < s.sequence.length) { s.flash = s.sequence[s.showIndex++]; s.stepAt = s.tick + 12; }
+      else s.phase = "input";
+    } else if (s.phase === "input") {
+      if (s.flash >= 0 && s.tick >= s.flashUntil) s.flash = -1;
+      const choices = [["arrowup", "w"], ["arrowright", "d"], ["arrowdown", "s"], ["arrowleft", "a"]];
+      const input = choices.findIndex((choice) => down(...choice));
+      if (input < 0) s.inputLocked = false;
+      else if (!s.inputLocked) {
+        s.inputLocked = true;
+        s.flash = input;
+        s.flashUntil = s.tick + 8;
+        if (input !== s.sequence[s.inputIndex]) endGame();
+        else if (++s.inputIndex === s.sequence.length) {
+          updateScore(s.score + s.sequence.length * 25);
+          s.sequence.push(Math.floor(Math.random() * 4));
+          s.showIndex = 0; s.inputIndex = 0; s.phase = "show"; s.flash = -1; s.stepAt = s.tick + 24;
+        }
+      }
+    }
   } else if (id === "kong") {
     s.x = clamp(s.x + (down("arrowleft", "a") ? -2.6 : 0) + (down("arrowright", "d") ? 2.6 : 0), 12, 468);
     if (down(" ") && s.onGround) { s.vy = -5.5; s.onGround = false; }
@@ -313,8 +430,18 @@ function draw() {
     ctx.fillStyle = "#f5f1e8"; if (id === "pong") { ctx.fillRect(20, s.y - 24, 6, 48); ctx.fillRect(454, s.enemyY - 24, 6, 48); ctx.setLineDash([4, 7]); ctx.beginPath(); ctx.moveTo(240, 5); ctx.lineTo(240, 265); ctx.strokeStyle = "#58645d"; ctx.stroke(); ctx.setLineDash([]); } else { s.bricks.forEach((b, i) => { if (b.on) box(b.x - 23, b.y, 44, 10, ["#ff7558", "#ffca63", "#73d9d0"][Math.floor(i / 7) % 3]); }); ctx.fillRect(s.x - 38, 220, 76, 7); }
     ctx.fillRect(s.ball.x - 4, s.ball.y - 4, 8, 8);
   } else if (id === "invaders" || id === "galaga") { s.enemies.filter((e) => e.on).forEach((e, i) => pixelAlien(e.x, e.y, i % 3)); s.shots.forEach((b) => box(b.x - 2, b.y, 4, 9, "#d6ff57")); pixelShip(s.x, 242); }
+  else if (id === "centipede") {
+    s.mushrooms.forEach((mushroom) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(mushroom.x, mushroom.y, 7, Math.PI, 0); ctx.fillRect(mushroom.x - 7, mushroom.y, 14, 6); ctx.fill(); });
+    s.segments.forEach((segment, index) => { ctx.fillStyle = index ? "#73d9d0" : "#d6ff57"; ctx.beginPath(); ctx.arc(segment.x, segment.y, 7, 0, Math.PI * 2); ctx.fill(); });
+    s.shots.forEach((shot) => box(shot.x - 2, shot.y, 4, 8, "#ffca63")); pixelShip(s.playerX, s.playerY);
+  } else if (id === "missile") {
+    s.bases.forEach((base) => { ctx.fillStyle = base.alive ? "#d6ff57" : "#51675b"; ctx.fillRect(base.x - 12, 249, 24, 9); ctx.fillRect(base.x - 4, 242, 8, 8); });
+    s.missiles.forEach((missile) => { ctx.strokeStyle = "#ff7558"; ctx.beginPath(); ctx.moveTo(missile.x, missile.y); ctx.lineTo(missile.x - missile.vx * 8, missile.y - missile.vy * 8); ctx.stroke(); });
+    s.blasts.forEach((blast) => { ctx.fillStyle = `rgba(255, 202, 99, ${blast.life / 28 * .25})`; ctx.beginPath(); ctx.arc(blast.x, blast.y, blast.radius, 0, Math.PI * 2); ctx.fill(); });
+    ctx.strokeStyle = "#d6ff57"; ctx.beginPath(); ctx.arc(s.x, s.y, 8, 0, Math.PI * 2); ctx.moveTo(s.x - 13, s.y); ctx.lineTo(s.x + 13, s.y); ctx.moveTo(s.x, s.y - 13); ctx.lineTo(s.x, s.y + 13); ctx.stroke();
+  }
   else if (id === "asteroids") { s.rocks.forEach((r) => { ctx.strokeStyle = "#d6ff57"; ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.stroke(); }); s.shots.forEach((b) => box(b.x, b.y, 3, 3, "#ff7558")); ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(s.angle + Math.PI / 2); ctx.fillStyle = "#73d9d0"; ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(8, 9); ctx.lineTo(0, 5); ctx.lineTo(-8, 9); ctx.closePath(); ctx.fill(); ctx.restore(); }
-  else if (["frogger", "maze", "bomber", "qbert"].includes(id)) {
+  else if (["frogger", "maze", "bomber", "digdug", "qbert"].includes(id)) {
     if (id === "frogger") { for (let y = 50; y < 235; y += 36) { ctx.fillStyle = y < 85 ? "#264238" : y < 200 ? "#174d59" : "#21362f"; ctx.fillRect(0, y, W, 32); } for (let i = 0; i < 6; i++) box((i * 81 + s.tick * (i % 2 ? 1 : -1)) % W, 105 + i % 3 * 30, 38, 14, "#b18b54"); }
     if (id === "maze") { for (let x = 20; x < W; x += 58) { ctx.strokeStyle = "#73d9d0"; ctx.strokeRect(x, 20, 38, 230); } s.dots.filter((d) => d.on).forEach((d) => box(d.x, d.y, 4, 4, "#ffca63")); ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(s.enemies[0].x, s.enemies[0].y, 8, 0, 7); ctx.fill(); }
     if (id === "bomber") {
@@ -323,8 +450,24 @@ function draw() {
       s.bombs.forEach((bomb) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(bomb.x, bomb.y, 8 + Math.sin(s.tick) * 2, 0, Math.PI * 2); ctx.fill(); });
       s.blasts.forEach((blast) => { ctx.fillStyle = `rgba(255, 117, 88, ${blast.life / 8 * .28})`; ctx.beginPath(); ctx.arc(blast.x, blast.y, 50, 0, Math.PI * 2); ctx.fill(); });
     }
+    if (id === "digdug") {
+      s.walls.forEach((wall) => box(wall.x, wall.y, 20, 20, "#51675b"));
+      s.enemies.forEach((enemy) => { ctx.fillStyle = "#ff7558"; ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 8, 0, Math.PI * 2); ctx.fill(); });
+      if (down(" ")) { ctx.strokeStyle = "#ffca63"; ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x + s.dir.x * 48, s.y + s.dir.y * 48); ctx.stroke(); }
+      box(s.x - 7, s.y - 7, 14, 14, "#73d9d0");
+    }
     if (id === "qbert") { for (let row = 0; row < 6; row++) for (let col = 0; col <= row; col++) { const x = 240 + (col - row / 2) * 42, y = 39 + row * 33; ctx.fillStyle = s.tiles[row][col] ? "#73d9d0" : (row * 3 + col) % 2 ? "#c85e49" : "#e3a64f"; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 20, y + 11); ctx.lineTo(x, y + 22); ctx.lineTo(x - 20, y + 11); ctx.closePath(); ctx.fill(); } }
-    box(s.x - 7, s.y - 7, 14, 14, "#d6ff57");
+    if (id !== "digdug") box(s.x - 7, s.y - 7, 14, 14, "#d6ff57");
+  } else if (id === "simon") {
+    const dark = ["#50602b", "#713d34", "#315d59", "#79613a"];
+    const bright = ["#d6ff57", "#ff7558", "#73d9d0", "#ffca63"];
+    const labels = ["↑", "→", "↓", "←"];
+    for (let i = 0; i < 4; i++) {
+      const x = 136 + i % 2 * 108, y = 30 + Math.floor(i / 2) * 108;
+      box(x, y, 96, 96, s.flash === i ? bright[i] : dark[i]);
+      ctx.fillStyle = "#f5f1e8"; ctx.textAlign = "center"; ctx.font = "bold 24px 'DM Mono', monospace"; ctx.fillText(labels[i], x + 48, y + 59);
+    }
+    ctx.fillStyle = "#f5f1e8"; ctx.font = "10px 'DM Mono', monospace"; ctx.fillText(s.phase === "show" ? "WATCH" : "YOUR TURN", W / 2, 265);
   } else if (id === "kong") { [228, 178, 128, 78].forEach((y) => box(0, y, W, 5, "#ff7558")); for (let x = 100; x < 400; x += 105) box(x, 80, 6, 148, "#73d9d0"); s.barrels.forEach((b) => box(b.x, b.y, 12, 12, "#ffca63")); box(s.x - 6, s.y - 14, 12, 14, "#d6ff57"); if (s.y < 52) box(425, 40, 18, 18, "#ffca63"); }
   else if (id === "lander") { ctx.strokeStyle = "#68786d"; ctx.beginPath(); ctx.moveTo(0, 250); ctx.lineTo(175, 235); ctx.lineTo(190, 247); ctx.moveTo(285, 247); ctx.lineTo(310, 236); ctx.lineTo(W, 252); ctx.stroke(); ctx.fillStyle = "#d6ff57"; ctx.fillRect(190, 241, 95, 3); ctx.save(); ctx.translate(s.x, s.y); ctx.rotate(s.angle); ctx.fillStyle = "#73d9d0"; ctx.fillRect(-7, -9, 14, 18); ctx.fillRect(-12, 7, 24, 3); ctx.restore(); box(16, 16, s.fuel, 3, "#ff7558"); }
   else if (id === "ski") { for (let i = 0; i < 16; i++) { const y = (i * 25 + s.tick * 2) % H, x = (i * 83) % W; ctx.fillStyle = "#73d9d0"; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 9, y + 19); ctx.lineTo(x + 9, y + 19); ctx.fill(); } s.obstacles.forEach((o) => { ctx.fillStyle = o.type === "rock" ? "#ff7558" : "#73d9d0"; ctx.fillRect(o.x - 6, o.y - 8, 12, 15); }); box(s.x - 3, 210, 6, 21, "#d6ff57"); }
