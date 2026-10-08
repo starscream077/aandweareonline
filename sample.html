@@ -51,7 +51,7 @@ kbd{font:700 .85em Georgia,serif;background:#f5c45126;border:1px solid #f5c45188
 <ul><li>Monkey overhead: duck under it, or attack.</li><li>Lion, tiger, bear, snake: jump over, or attack (bears take two hits).</li><li>Streams and hidden pits: jump in time.</li><li>Wide river: jump, then press action to grab the branch and swing across.</li><li>Dacoits and enemy spies (purple masks): land on them to stun, or attack. Spies may hang overhead: duck.</li><li>Citizens, stray dogs, cows, pigeons: jump or duck only. Attacking the innocent costs points!</li><li>Runaway carts: jump over, or attack to smash them.</li></ul>
 <div class="row"><button class="btn" id="rsm">Resume</button><button class="btn" id="rst">Restart level</button></div></div>
 <div id="tc"><div class="tl"><button class="b" data-k="L">◀</button><button class="b" data-k="R">▶</button></div>
-<div class="tr"><button class="b" data-k="D">▼</button><button class="b" data-k="U">▲</button><button class="b" data-k="A">⚔</button></div></div>
+<div class="tr"><button class="b" data-k="U">▲</button><button class="b" data-k="D">▼</button><button class="b" data-k="A">⚔</button></div></div>
 <script>
 const $=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d');
 let W,H,u,oy,VW,dpr=1;
@@ -83,6 +83,12 @@ function gen(){const S=LV.q.split(' ');
 const Wd={monkey:34,lion:84,tiger:84,bear:64,snake:48,stream:70,river:280,pit:64,dacoit:30,citizen:26,dog:40,cow:80,pigeons:56,spy:28,spyH:30,cart:76},Hh={monkey:36,lion:46,tiger:46,bear:62,snake:14,dacoit:76,stream:0,river:0,pit:0,citizen:74,dog:28,cow:56,pigeons:22,spy:76,spyH:60,cart:48};
 ob=[];let p=800;S.forEach((s,i)=>{ob.push({t:s,x:p,tx:p,w:Wd[s]+(s=='stream'||s=='pit'?lv*5:0),h:Hh[s],hp:s=='bear'?2:1,r:0,dy:0,dv:0,dd:0,vl:36,va:0,vv:0,lift:LF[s]||0});p+=LV.sp+Rn(i+lv*20)*70+(s=='river'?170:0)});LEN=p+300}
 function reset(){sawT={};startLevel(0,0)}
+function enterImmersiveMode(){
+if(!matchMedia('(pointer:coarse)').matches)return;
+if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().catch(error=>console.warn('Fullscreen request was denied.',error))}
+if(screen.orientation?.lock){screen.orientation.lock('landscape').catch(error=>console.warn('Landscape orientation lock was denied.',error))}
+}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)screen.orientation?.unlock?.()});
 function lvlDone(){mode='lvl';$('pb').style.display='none';$('et').textContent='Level '+(lv+1)+' complete!';$('es').textContent='Next: '+LVS[lv+1].n+'. Score: '+score;$('eb').textContent='Next level';$('end').style.display='block'}
 function startLevel(n,s0){lv=n;LV=LVS[n];th=LV;ls=score=s0;sc=0;px=150;py=G;vy=0;hp=3;inv=0;atk=0;grab=null;low=null;fallG=null;k={};gen();mode='card';clearTimeout(ctid);$('lvn').textContent='LEVEL '+(n+1)+' OF '+LVS.length;$('lvt').textContent=LV.n;$('lvs').textContent=LV.d;$('lv').classList.add('on');ctid=setTimeout(()=>{$('lv').classList.remove('on');if(mode=='card')mode='play'},2800);$('end').style.display='none';$('ps').style.display='none';$('pz').style.display='none';$('ov').classList.add('h');$('pb').style.display='block';$('tc').style.visibility='';$('tc').style.display=matchMedia('(pointer:coarse)').matches?'block':'none'}
 function pauseG(){if(mode!='play')return;mode='paused';k={};$('ps').style.display='block';$('tc').style.visibility='hidden'}
@@ -98,7 +104,7 @@ const map={ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R',ArrowUp:'U',KeyW:'U',A
 addEventListener('keydown',e=>{if(e.code=='KeyP'||e.code=='Escape'){e.preventDefault();mode=='paused'?unpause():pauseG();return}const m=map[e.code];if(!m||mode=='paused')return;e.preventDefault();if(!k[m]&&m=='A')act();else if(mode=='pause')resume();k[m]=1});
 addEventListener('keyup',e=>{const m=map[e.code];if(m)k[m]=0});addEventListener('blur',()=>{k={};pauseG()});
 document.querySelectorAll('[data-k]').forEach(b=>{const q=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();k[q]=1;if(q=='A')act();else resume()});['pointerup','pointercancel','pointerleave'].forEach(v=>b.addEventListener(v,()=>k[q]=0))});
-$('pzb').onclick=resume;$('go').onclick=reset;$('eb').onclick=()=>{mode=='lvl'?startLevel(lv+1,score):mode=='win'?reset():startLevel(lv,ls)};
+$('pzb').onclick=resume;$('go').onclick=()=>{enterImmersiveMode();reset()};$('eb').onclick=()=>{mode=='lvl'?startLevel(lv+1,score):mode=='win'?reset():startLevel(lv,ls)};
 // intro timeline
 const T=[];const at=(ms,f)=>T.push(setTimeout(f,ms)),on=(i,v)=>$(i).classList.toggle('on',v);
 at(600,()=>on('p1',1));at(7200,()=>on('p1',0));at(8700,()=>on('p2',1));at(15500,()=>on('p2',0));at(17000,()=>on('big',1));at(20000,()=>on('big',0));at(21200,()=>{on('how',1);$('skip').style.display='none'});
